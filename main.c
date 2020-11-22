@@ -59,7 +59,7 @@ char **construction_tableau_chaine(char *line)
 }
 
 //3.---------Executer entree + Lancement minishell------------
-int executer_ligne(char **args)
+int executer_ligne(char **args, char **envp)
 {
     char  *repertoire_absolu;
     char  *repertoire;
@@ -90,7 +90,8 @@ int executer_ligne(char **args)
         pid = fork();
         if (pid == 0) {
             // Processus fils
-            if (execvp(args[0], args) == -1) { //Remplacement image processus appelant
+            if (execve(args[0], args, envp) == -1) { //Remplacement image processus appelant
+                
                 perror("Error execvp");
             }
             exit(EXIT_FAILURE);
@@ -148,7 +149,7 @@ int main(int argc, char **argv, char **envp) {
         printf("%s > ", str_destination);
         chaine = lire_ligne();
         args = construction_tableau_chaine(chaine);
-        execute = executer_ligne(args);
+        execute = executer_ligne(args, envp);
 
         //Libération de la mémoire
         free(chaine);
