@@ -11,15 +11,13 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define BUFSIZE 1024
 #define DELIMITATION " \n"  //Retour a la ligne
 
 //1.-----------------------Lire entree-------------------------
 char *lire_ligne(void)
 {
-  int buffersize = BUFSIZE;
   int indice = 0;
-  char *buffer = malloc(sizeof(char) * buffersize);
+  char *buffer = malloc(sizeof(char) * 1024);
   int a;
 
   while (1) {
@@ -53,11 +51,6 @@ char **construction_tableau_chaine(char *line)
         elements[indice] = element;
         indice++;
 
-        if (indice >= buffersize) {
-            buffersize += 64;
-            elements = realloc(elements, buffersize * sizeof(char*));
-        }
-
         //Deuxieme découpage
         element = strtok(NULL, DELIMITATION);
     }
@@ -71,7 +64,7 @@ int executer_ligne(char **args)
     char  *repertoire_absolu;
     char  *repertoire;
     char  *repertoire_destination;
-    char buffer[BUFSIZE];
+    char buffer[1024];
     
     if (args[0] == NULL) {
         //Si aucun argument en entrée
