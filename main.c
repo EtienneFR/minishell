@@ -38,14 +38,15 @@ char *lire_ligne(void)
 }
 
 //2.----- Construction de argv (tableau de chaine) -----------
-char **construction_tableau_chaine(char *line)
+char **construction_tableau_chaine(char *line, char**envp)
 {
     int buffersize = 64, indice = 0;
     char **elements = malloc(buffersize * sizeof(char*)); //Allocation mémoire
     char *element;
-
+    
     //Premier decoupage
     element = strtok(line, DELIMITATION);
+    
     //Parcours
     while (element != NULL) {
         elements[indice] = element;
@@ -54,7 +55,9 @@ char **construction_tableau_chaine(char *line)
         //Deuxieme découpage
         element = strtok(NULL, DELIMITATION);
     }
+
     elements[indice] = NULL;
+
     return elements;
 }
 
@@ -86,13 +89,13 @@ int executer_ligne(char **args, char **envp)
         //Lancement du minishell
         pid_t pid, wpid;
         int status;
-
+        
         pid = fork();
         if (pid == 0) {
             // Processus fils
             if (execve(args[0], args, envp) == -1) { //Remplacement image processus appelant
                 
-                perror("Error execvp");
+                perror("Error execve");
             }
             exit(EXIT_FAILURE);
         } else if (pid < 0) {
@@ -113,7 +116,7 @@ int executer_ligne(char **args, char **envp)
 }
 
 //------------------------ Main ------------------------------
-int main(int argc, char **argv, char **envp) {
+int main(int argc, char **argv, char *envp[]) {
 
     //Etapes du mini shell
     //1. Lire la ligne en entrée
@@ -148,7 +151,7 @@ int main(int argc, char **argv, char **envp) {
         
         printf("%s > ", str_destination);
         chaine = lire_ligne();
-        args = construction_tableau_chaine(chaine);
+        args = construction_tableau_chaine(chaine, envp);
         execute = executer_ligne(args, envp);
 
         //Libération de la mémoire
